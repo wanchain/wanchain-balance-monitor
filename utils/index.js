@@ -56,17 +56,42 @@ const unlockAccount = (account, pwd, duration) =>
 
 const getBalance = (account) =>
 	new Promise((resolve) => 
-		resolve(web3.eth.getBalance(account))
+		//resolve(web3.eth.getBalance(account))
+		web3.eth.getBalance(account, (err, balance) => {
+			if (err) {
+				console.log('getBalance error: ', err)
+				reject(err)
+			}
+			
+			resolve(balance)
+		})
 	)
 
 const getBalance2 = (account, blockNumber) =>
 	new Promise((resolve) =>
-		resolve(web3.eth.getBalance(account, blockNumber))
+		//resolve(web3.eth.getBalance(account, blockNumber))
+		web3.eth.getBalance(account, blockNumber, (err, balance) => {
+			if (err) {
+				console.log('getBalance2 error: ', err)
+				reject(err)
+			}
+			
+			resolve(balance)
+		})
+
 	)
 
 const getTotalBalance = (blockNumber) =>
 	new Promise((resolve) =>
-		resolve(web3.monitor.getTotalBalance(blockNumber))
+		web3.monitor.getTotalBalance(blockNumber, (err, balance) => {
+			if (err) {
+				console.log('getTotalBalance error: ', err)
+				reject(err)
+			}
+			
+			console.log('getTotalBalance suc')
+			resolve(balance)
+		})
 	)
 
 
