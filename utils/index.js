@@ -89,7 +89,6 @@ const getTotalBalance = (blockNumber) =>
 				reject(err)
 			}
 			
-			console.log('getTotalBalance suc')
 			resolve(balance)
 		})
 	)
