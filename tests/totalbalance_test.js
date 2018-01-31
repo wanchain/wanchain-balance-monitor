@@ -89,7 +89,9 @@ describe('total balance equilibrium', function() {
 
 	    beginBlockNum = utils.getBlockNumber();
 		  curBlockNum = beginBlockNum;
-		
+
+		  let warnCount = 0
+
 			while (true) {
 				if (curBlockNum > utils.getBlockNumber()) {
 					 sleep(5);
@@ -101,10 +103,17 @@ describe('total balance equilibrium', function() {
 					// release the alarm
 					console.log("exception! total balance equilibrium alarm.");
 
-					sms.sendSms(utils.fromWei(totalBalance).toString())
+					if (warnCount < 3) {
+             sms.sendSms(utils.fromWei(totalBalance).toString())
+          } else {
+						 break
+					}
+
+          warnCount++
 
 				} else {
-					console.log("tranquil. curBlockNum:" + curBlockNum.toString() + ", totalBalancePre:" + utils.fromWei(totalBalancePre).toString() + " wan, totalBalance:" + utils.fromWei(totalBalance).toString() + " wan");
+           warnCount = 0
+					 console.log("tranquil. curBlockNum:" + curBlockNum.toString() + ", totalBalancePre:" + utils.fromWei(totalBalancePre).toString() + " wan, totalBalance:" + utils.fromWei(totalBalance).toString() + " wan");
 				}
 
 				curBlockNum++;
