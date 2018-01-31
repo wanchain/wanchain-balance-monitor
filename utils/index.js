@@ -244,6 +244,9 @@ const times = (a, b) => new BigNumber(a).times(new BigNumber(b))
 
 const gt = (a, b) => new BigNumber(a).gt(new BigNumber(b))
 
+const le = (a, b) => new BigNumber(a).lessThanOrEqualTo(new BigNumber(b))
+const ge = (a, b) => new BigNumber(a).greaterThanOrEqualTo(new BigNumber(b))
+
 const toBig = (n) => {
 	return new BigNumber(n)
 }
@@ -278,5 +281,7 @@ module.exports = {
 	minus,
 	times,
 	gt,
+	le,
+	ge,
 	toBig
 }

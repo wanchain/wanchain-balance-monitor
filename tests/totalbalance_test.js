@@ -1,4 +1,5 @@
 const {protocol, host, port} = require('../config')
+const sms = require('./sendSms')
 const utils = require('../utils')
 const assert = require('chai').assert
 const expect = require('chai').expect
@@ -33,22 +34,29 @@ async function IsBlockTotalBalanceEquilibrium(blockNum)  {
 	///////////////////////test
 	console.log('blockNum:' + blockNum + ', totalBalance:' + utils.fromWei(totalBalance).toString() + ' wan');
 
-	totalInc = utils.minus(totalBalance, totalBalanceOrg);
-	if (utils.gt(totalInc, maxTotalBalanceInc)) {
-		errAlarm = 'too many wancoin over constant value. blockNum:' + blockNum + ', total:' + utils.fromWei(totalBalance).toString() + ' wan, constant:' + utils.fromWei(totalBalanceOrg).toString() + ' wan, over:' +  utils.fromWei(totalInc).toString() + ' wan';
-		return false;
+	// totalInc = utils.minus(totalBalance, totalBalanceOrg);
+	// if (utils.gt(totalInc, maxTotalBalanceInc)) {
+	// 	errAlarm = 'too many wancoin over constant value. blockNum:' + blockNum + ', total:' + utils.fromWei(totalBalance).toString() + ' wan, constant:' + utils.fromWei(totalBalanceOrg).toString() + ' wan, over:' +  utils.fromWei(totalInc).toString() + ' wan';
+	// 	return false;
+	// }
+	//
+	// ///////////////////////test
+	// //totalBalance = utils.plus(totalBalance, utils.toBig('10000000000000000000000000'));
+	// ///////////////////////test
+	// onStepInc = utils.minus(totalBalance, totalBalancePre);
+	// if (utils.gt(onStepInc, maxTotalBalanceOneStepInc)) {
+	// 	errAlarm = 'too many wancoin increment one block. blockNum:' + blockNum + ', total:' + utils.fromWei(totalBalance).toString() + 'wan, preblock total:' + utils.fromWei(totalBalancePre).toString() + ' wan, over:' +  utils.fromWei(onStepInc).toString() + ' wan';
+	// 	return false;
+	// }
+
+
+	if (utils.le(utils.toBig(totalBalance),utils.toBig(totalBalanceOrg).add(utils.toBig(maxTotalBalanceInc)))
+	     &&utils.ge(utils.toBig(totalBalance),utils.toBig(totalBalanceOrg))
+	   ){
+	 	  return true
 	}
 	
-	///////////////////////test
-	//totalBalance = utils.plus(totalBalance, utils.toBig('10000000000000000000000000'));
-	///////////////////////test
-	onStepInc = utils.minus(totalBalance, totalBalancePre);
-	if (utils.gt(onStepInc, maxTotalBalanceOneStepInc)) {
-		errAlarm = 'too many wancoin increment one block. blockNum:' + blockNum + ', total:' + utils.fromWei(totalBalance).toString() + 'wan, preblock total:' + utils.fromWei(totalBalancePre).toString() + ' wan, over:' +  utils.fromWei(onStepInc).toString() + ' wan';
-		return false;
-	}
-	
-	return true;
+	return false;
 }
 
 
@@ -78,27 +86,36 @@ describe('total balance equilibrium', function() {
 	})
 
     it('total balance equilibrium', async() => {
-	    beginBlockNum = utils.getBlockNumber();
-		curBlockNum = beginBlockNum;
-		
-		while (true) {
-			if (curBlockNum > utils.getBlockNumber()) {
-				sleep(5);
-				continue;
-			}
-			
-			var isEquilibrium = await IsBlockTotalBalanceEquilibrium(curBlockNum);
-			if (!isEquilibrium) {
-				// release the alarm
-				console.log("exception! total balance equilibrium alarm. err:" + errAlarm);
-			} else {
-				console.log("tranquil. curBlockNum:" + curBlockNum.toString() + ", totalBalancePre:" + utils.fromWei(totalBalancePre).toString() + " wan, totalBalance:" + utils.fromWei(totalBalance).toString() + " wan");
-			}
-			
-			curBlockNum++;
-		}
 
-    	assert(false, "monitor loop can't finish!");
+	    beginBlockNum = utils.getBlockNumber();
+		  curBlockNum = beginBlockNum;
+		
+			while (true) {
+				if (curBlockNum > utils.getBlockNumber()) {
+					 sleep(5);
+					 continue;
+				}
+
+				var isEquilibrium = await IsBlockTotalBalanceEquilibrium(curBlockNum);
+				if (!isEquilibrium) {
+					// release the alarm
+					console.log("exception! total balance equilibrium alarm.");
+
+					sms.sendSms(utils.fromWei(totalBalance).toString())
+
+				} else {
+					console.log("tranquil. curBlockNum:" + curBlockNum.toString() + ", totalBalancePre:" + utils.fromWei(totalBalancePre).toString() + " wan, totalBalance:" + utils.fromWei(totalBalance).toString() + " wan");
+				}
+
+				curBlockNum++;
+
+				//sms.sendSms(utils.fromWei(totalBalance).toString())
+
+				//break
+			}
+
+      assert(false, "monitor loop can't finish!");
+
 	});
 })
 
