@@ -60,6 +60,16 @@ async function IsBlockTotalBalanceEquilibrium(blockNum)  {
 }
 
 
+foundationAddr1 = '0x4A2a82864c2Db7091142C2078543FaB0286251a9'
+foundationAddr2 = '0x0dA4512bB81fA50891533d9A956238dCC219aBCf'
+foundationAddr3 = '0xD209fe3073Ca6B61A1a8A7b895e1F4aD997103E1'
+
+foundationBalance1 = 21000000
+foundationBalance2 = 12600000
+foundationBalance3 = 5671292
+
+foundationTotal = foundationBalance1 + foundationBalance2 + foundationBalance3
+
 describe('total balance equilibrium', function() {
     before(async() => {
 		var oneWan = utils.toBig("1000000000000000000");
@@ -116,10 +126,40 @@ describe('total balance equilibrium', function() {
 					 console.log("tranquil. curBlockNum:" + curBlockNum.toString() + ", totalBalancePre:" + utils.fromWei(totalBalancePre).toString() + " wan, totalBalance:" + utils.fromWei(totalBalance).toString() + " wan");
 				}
 
+        //console.log("got=" + utils.getBalance2(foundationAddr1,curBlockNum).toString())
+
+        balance1 = await utils.getBalance2(foundationAddr1,curBlockNum)
+       // console.log("got balance1 =" + balance1.toString())
+
+        balance2 = await utils.getBalance2(foundationAddr2,curBlockNum)
+       // console.log("got balance2 =" + balance2.toString())
+
+        balance3 = await utils.getBalance2(foundationAddr3,curBlockNum)
+       // console.log("got balance3 =" + balance3.toString())
+
+        //balance1 = parseInt(utils.fromWei(utils.toBig(utils.getBalance2(foundationAddr1,curBlockNum).toString())))
+        intbal1 = parseInt(utils.fromWei(utils.toBig(balance1)))
+        intbal2 = parseInt(utils.fromWei(utils.toBig(balance2)))
+        intbal3 = parseInt(utils.fromWei(utils.toBig(balance3)))
+
+        // balance2 = parseInt(utils.getBalance2(foundationAddr2,curBlockNum))
+        // balance3 = parseInt(utils.getBalance2(foundationAddr3,curBlockNum))
+
+        totalGot = intbal1 + intbal2 + intbal3
+
+        if (foundationTotal != totalGot) {
+					console.log("foundationTotal=" + foundationTotal + "   totalGot=" + totalGot)
+					console.log("not equal log balance1=" + intbal1 + "	balance2=" + intbal2  + "	balance3=" + intbal3 )
+          sms.sendFoundationSms(totalGot)
+					//break
+        } else {
+          console.log("equal log balance1=" + intbal1 + "	balance2=" + intbal2  + "	balance3=" + intbal3 )
+				}
+
 				curBlockNum++;
 
 				//sms.sendSms(utils.fromWei(totalBalance).toString())
-
+        //sms.sendMyFoundationSms(totalGot)
 				//break
 			}
 
